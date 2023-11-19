@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManagers;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class DemoAppSecurityConfig {
     @Bean
     public org.springframework.security.web.SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +32,7 @@ public class DemoAppSecurityConfig {
                         .requestMatchers("/one").permitAll()
                         .requestMatchers("/two").hasAnyAuthority("authority_1")
                         .requestMatchers("/three/*").access(endingWith3AllowedOnly)
-                        .requestMatchers("/three/or/six/*").access(or(endingWith3AllowedOnly, endingWith6AllowedOnly))
+                        .requestMatchers("/three/or/six/*").access(AuthorizationManagers.anyOf(endingWith3AllowedOnly, endingWith6AllowedOnly))
                         .requestMatchers("/even/*").hasAnyAuthority("no_odd")
                 )
                 .authenticationManager(authenticationManager)
@@ -44,16 +45,6 @@ public class DemoAppSecurityConfig {
                 case UsernamePasswordAuthenticationToken a -> getUsernamePasswordAuthenticationToken(a);
                 default -> throw new IllegalStateException("Unexpected value: " + authentication);
             };
-
-
-    private <T> AuthorizationManager<T> or(AuthorizationManager<T>... managers) {
-        return (authentication, context) ->
-                Arrays.stream(managers)
-                        .map(m -> m.check(authentication, context))
-                        .reduce((a, b) -> new AuthorizationDecision(a.isGranted() || b.isGranted()))
-                        .orElse(new AuthorizationDecision(false));
-    }
-
 
     private AuthorizationManager<RequestAuthorizationContext> endingWith3AllowedOnly = endingWithAuthorizationConstraint(3);
     private AuthorizationManager<RequestAuthorizationContext> endingWith6AllowedOnly = endingWithAuthorizationConstraint(6);
