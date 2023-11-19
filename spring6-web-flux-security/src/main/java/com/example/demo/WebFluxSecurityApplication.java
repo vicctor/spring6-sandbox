@@ -26,10 +26,10 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-@SpringBootApplication
-@EnableWebFluxSecurity
-@RestController
-@EnableReactiveMethodSecurity
+//@SpringBootApplication
+//@EnableWebFluxSecurity
+//@RestController
+//@EnableReactiveMethodSecurity
 public class WebFluxSecurityApplication {
     public static void main(String[] args) {
         SpringApplication.run(WebFluxSecurityApplication.class, args);
