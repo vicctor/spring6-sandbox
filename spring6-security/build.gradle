@@ -29,4 +29,7 @@ tasks.named('bootBuildImage') {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_17_PREVIEW
+compileJava {
+	options.encoding = 'UTF-8'
+	options.compilerArgs +=[ "-parameters", "--enable-preview"]
+}
